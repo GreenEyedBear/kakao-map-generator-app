@@ -3,7 +3,7 @@
   "productName": "MapGenerator",
   "description": "MapGenerator app",
   "repository": "https://github.com/tzhf/map-generator-app",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "electron-forge start",
