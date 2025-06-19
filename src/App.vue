@@ -221,7 +221,6 @@
             <Checkbox v-if="!settings.rejectOfficial" v-model="settings.rejectUnofficial"
               >Reject unofficial</Checkbox
             >
-
             <Checkbox v-model="settings.rejectOfficial">Find unofficial coverage</Checkbox>
             <Checkbox v-if="settings.rejectOfficial" v-model="settings.findPhotospheres"
               >Find photospheres only</Checkbox
@@ -496,7 +495,7 @@
 
 <script setup lang="ts">
 const { electronAPI } = window
-import { onMounted, ref, reactive, computed } from 'vue'
+import { onMounted, ref, watch, reactive, computed } from 'vue'
 import { useStorage } from '@vueuse/core'
 
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
@@ -627,6 +626,15 @@ const storedSettings = useStorage('map_generator__settings', {
 const settings = reactive(storedSettings.value)
 settings.toDate = currentDate
 settings.toYear = currentYear
+
+watch(
+  () => settings.rejectOfficial,
+  (newVal) => {
+    if (newVal) {
+      settings.rejectUnofficial = false
+    }
+  },
+)
 
 const panels = useStorage('map_generator__panels', {
   layer: true,
