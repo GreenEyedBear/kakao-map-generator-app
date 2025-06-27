@@ -164,63 +164,6 @@ const defaultSettings = {
           ],
         },
       ],
-      osm: [
-        { label: 'No data', active: false, threshold: 0.2, colors: ['242,239,233'] }, // rgb(242,239,233)
-        { label: 'Motorway', active: false, threshold: 0.05, colors: ['232,146,162'] }, // rgb(232,146,162)
-        { label: 'Main road 1', active: false, threshold: 0.05, colors: ['249,178,156'] }, // rgb(249,178,156)
-        { label: 'Main road 2', active: false, threshold: 0.05, colors: ['252,214,164'] }, // rgb(252,214,164)
-        { label: 'Main road 3', active: false, threshold: 0.05, colors: ['247,250,191'] }, // rgb(247,250,191)
-        { label: 'White road', active: false, threshold: 0.05, colors: ['255,255,255'] }, // rgb(255,255,255)
-        { label: 'Bridges', active: false, threshold: 0, colors: ['184,184,184'] }, // rgb(184,184,184) - min zoom 17
-        {
-          label: 'Train tracks',
-          active: false,
-          threshold: 0,
-          colors: ['112,112,112'],
-        }, // rgb(112,112,112)  secondary tracks are rgb(170,170,170) but some ports have the same color
-        {
-          label: 'Tracks',
-          active: false,
-          threshold: 0,
-          colors: ['172,131,49'], // rgb(172,131,49)
-        },
-
-        {
-          label: 'Footway',
-          active: false,
-          threshold: 0,
-          colors: ['250,128,114'], // rgb(250,128,114)
-        },
-        { label: 'Forest, woods', active: false, threshold: 0.2, colors: ['173,209,158'] }, // rgb(173,209,158)
-        { label: 'Grass, meadow', active: false, threshold: 0.2, colors: ['205,235,176'] }, // rgb(205,235,176)
-        { label: 'Vineyard, orchard', active: false, threshold: 0.2, colors: ['174,223,163'] }, // rgb(174,223,163)
-        { label: 'Farm', active: false, threshold: 0.2, colors: ['245,220,186'] }, // rgb(245,220,186)
-        { label: 'Farmland', active: false, threshold: 0.2, colors: ['238,240,213'] }, // rgb(238,240,213)
-        { label: 'Heathland', active: false, threshold: 0.2, colors: ['214,217,159'] }, // rgb(214,217,159)
-        { label: 'Scrubland', active: false, threshold: 0.2, colors: ['200,215,171'] }, // rgb(200,215,171)
-        {
-          label: 'Bare rock',
-          active: false,
-          threshold: 0.2,
-          colors: ['238,229,220', '237,228,220'],
-        }, // rgb(238,229,220) - rgb(237,228,220)
-        { label: 'Sand', active: false, threshold: 0.2, colors: ['245,233,198'] }, // rgb(245,233,198)
-        { label: 'Beach, shoal', active: false, threshold: 0.2, colors: ['255,241,186'] }, // rgb(255,241,186)
-        { label: 'Water', active: false, threshold: 0.2, colors: ['170,211,223'] }, // rgb(170,211,223)
-        { label: 'Buildings', active: false, threshold: 0.05, colors: ['217,208,201'] }, // rgb(217,208,201)
-        { label: 'Residential area', active: false, threshold: 0.2, colors: ['224,223,223'] }, // rgb(224,223,223)
-        { label: 'Retail area', active: false, threshold: 0.2, colors: ['255,214,209'] }, // rgb(255,214,209)
-        { label: 'Commercial area', active: false, threshold: 0.2, colors: ['242,218,217'] }, // rgb(242,218,217)
-        { label: 'Industrial area', active: false, threshold: 0.2, colors: ['235,219,232'] }, // rgb(235,219,232)
-        { label: 'Brownfield site', active: false, threshold: 0.2, colors: ['199,199,180'] }, // rgb(199,199,180)
-        { label: 'School, Hospital', active: false, threshold: 0.05, colors: ['255,255,229'] }, // rgb(255,255,229)
-        { label: 'Park', active: false, threshold: 0.05, colors: ['200,250,204'] }, // rgb(200,250,204)
-        { label: 'Place of worship', active: false, threshold: 0.05, colors: ['196,182,171'] }, // rgb(196,182,171)
-        { label: 'Cemetery', active: false, threshold: 0.05, colors: ['170,203,175'] }, // rgb(170,203,175)
-        { label: 'Sports pitch', active: false, threshold: 0.05, colors: ['136,224,190'] }, // rgb(136,224,190)
-        { label: 'Sports center', active: false, threshold: 0.05, colors: ['223,252,226'] }, // rgb(223,252,226)
-        { label: 'Camping, golf course', active: false, threshold: 0.05, colors: ['222,246,192'] }, // rgb(222,246,192)
-      ],
     },
   } as TileColorConfig,
 
@@ -258,7 +201,7 @@ const defaultSettings = {
   checkImports: false,
 }
 
-const storedSettings = useStorage('map_generator__settings_v3', defaultSettings)
+const storedSettings = useStorage('map_generator__settings_v4', defaultSettings)
 const settings = reactive(storedSettings.value)
 settings.toDate = currentDate
 settings.toYear = currentYear

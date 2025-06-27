@@ -352,7 +352,6 @@
                 Tile provider :
                 <select v-model="settings.findByTileColor.tileProvider">
                   <option value="gmaps">Google Maps</option>
-                  <option value="osm">OSM</option>
                 </select>
               </div>
 

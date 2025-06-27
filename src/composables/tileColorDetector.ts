@@ -14,9 +14,7 @@ function lng2tile(lng: number, zoom: number) {
 export function getTileUrl(loc: LatLng, type: TileProvider, zoom: number) {
   const tileX = lng2tile(loc.lng, zoom)
   const tileY = lat2tile(loc.lat, zoom)
-  return type === 'osm'
-    ? `https://tile.openstreetmap.org/${zoom}/${tileX}/${tileY}.png`
-    : `https://www.google.com/maps/vt?pb=!1m7!8m6!1m3!1i${zoom}!2i${tileX}!3i${tileY}!2i9!3x1!2m2!1e0!2sm!3m5!2sen!3sus!5e1105!12m1!1e3!4e0!5m4!1e0!8m2!1e1!1e1!6m6!1e12!2i2!11e0!39b0!44e0!50e0`
+  return `https://www.google.com/maps/vt?pb=!1m7!8m6!1m3!1i${zoom}!2i${tileX}!3i${tileY}!2i9!3x1!2m2!1e0!2sm!3m5!2sen!3sus!5e1105!12m1!1e3!4e0!5m4!1e0!8m2!1e1!1e1!6m6!1e12!2i2!11e0!39b0!44e0!50e0`
   // `https://mt1.google.com/vt/lyrs=m&x=${tileX}&y=${tileY}&z=${zoom}`
 }
 
