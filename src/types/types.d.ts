@@ -41,7 +41,7 @@ interface Panorama {
 }
 
 type TileOperators = 'AND' | 'OR' | 'NOT'
-type TileProvider = 'gmaps'
+type TileProvider = 'osm' | 'gmaps'
 
 interface TileColor {
   label: string
@@ -56,4 +56,11 @@ interface TileColorConfig {
   operator: TileOperators
   tileProvider: TileProvider
   tileColors: Record<TileProvider, TileColor[]>
+}
+
+interface SearchInDescriptionConfig {
+  enabled: boolean
+  searchTerms: string
+  searchMode: 'fullword' | 'startswith' | 'endswith' | 'contains'
+  filterType: 'include' | 'exclude'
 }
