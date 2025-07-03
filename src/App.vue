@@ -376,7 +376,7 @@
             </div>
 
             <Checkbox v-model="settings.findByTileColor.enabled">Find by tile color</Checkbox>
-            <div v-if="settings.findByTileColor.enabled" class="space-y-0.5 ml-6 py-1">
+            <div v-if="settings.findByTileColor.enabled" class="space-y-0.5 ml-6 pb-1">
               <div class="flex justify-between items-center gap-2">
                 Include/Exclude :
                 <select v-model="settings.findByTileColor.filterType">
@@ -412,7 +412,6 @@
                 <select v-model="settings.findByTileColor.operator">
                   <option value="OR">OR</option>
                   <option value="AND">AND</option>
-                  <option value="NOT">NOT</option>
                 </select>
               </div>
 
