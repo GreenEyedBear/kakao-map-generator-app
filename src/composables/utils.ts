@@ -51,7 +51,7 @@ function normalizeText(text: string) {
 }
 
 function tokenize(text: string) {
-  return text.split(/[\s\-_,.;!?()'"“”«»]+/).filter(Boolean)
+  return text.split(/[\s_,.;!?()'"“”«»]+/).filter(Boolean)
 }
 
 export function searchInDescription(
