@@ -41,7 +41,7 @@ interface Panorama {
 }
 
 type TileOperators = 'AND' | 'OR'
-type TileProvider = 'osm' | 'gmaps'
+type TileProvider = 'gmaps'
 
 interface TileColor {
   label: string
