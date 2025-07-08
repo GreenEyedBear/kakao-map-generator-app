@@ -462,31 +462,30 @@
               </div>
             </div>
 
-            <Checkbox
-              @change="
-                settings.getDeadEnds
-                  ? (settings.getIntersection = false) || (settings.getCurve = false)
-                  : true
-              "
-              v-model="settings.getDeadEnds"
-              >Find dead ends (end of coverage)</Checkbox
-            >
-            <div v-if="settings.getDeadEnds" class="ml-6">
-              <Checkbox v-model="settings.deadEndsLookBackwards">Look towards dead end</Checkbox>
+            <Checkbox v-model="settings.filterByLinksLength.enabled">
+              Filter by links length
+            </Checkbox>
+            <div v-if="settings.filterByLinksLength.enabled" class="ml-6">
+              <label class="flex items-center justify-between">
+                <div class="flex items-center gap-1 relative">
+                  Range
+                  <Tooltip>
+                    0 : photosphere/isolated<br />
+                    1 : one arrow (dead end)<br />
+                    > 2 : intersection
+                  </Tooltip>
+                </div>
+                <Slider
+                  v-model="settings.filterByLinksLength.range"
+                  :min="0"
+                  :max="5"
+                  tooltipPosition="bottom"
+                  class="w-32 pr-2"
+                />
+              </label>
             </div>
 
-            <Checkbox
-              @change="settings.getIntersection ? (settings.getDeadEnds = false) : true"
-              v-model="settings.getIntersection"
-              >Find intersection locations</Checkbox
-            >
-
-            <Checkbox
-              @change="settings.getCurve ? (settings.getDeadEnds = false) : true"
-              v-model="settings.getCurve"
-            >
-              Find curve locations
-            </Checkbox>
+            <Checkbox v-model="settings.getCurve"> Find curve locations </Checkbox>
 
             <label v-if="settings.getCurve" class="ml-6 flex items-center justify-between">
               Min curve angle ({{ settings.minCurveAngle }}°)
@@ -929,13 +928,18 @@ async function isPanoGood(pano: google.maps.StreetViewPanoramaData) {
     // Find trekkers
     if (settings.rejectDescription && hasAnyDescription(pano.location)) return false
 
-    if (settings.getDeadEnds && pano.links && pano.links.length > 1) return false
-
-    if (settings.getCurve || settings.getIntersection) {
+    if (settings.filterByLinksLength.enabled) {
       const links = pano.links ?? []
-      const isIntersection = settings.getIntersection && links.length >= 3
-      const isCurve = settings.getCurve && isAcceptableCurve(links, settings.minCurveAngle)
-      if (!isIntersection && !isCurve) return false
+      if (
+        links.length < settings.filterByLinksLength.range[0] ||
+        links.length > settings.filterByLinksLength.range[1]
+      )
+        return
+    }
+
+    if (settings.getCurve) {
+      const links = pano.links ?? []
+      if (!isAcceptableCurve(links, settings.minCurveAngle)) return false
     }
 
     if (settings.findByTileColor.enabled) {
@@ -1118,11 +1122,7 @@ function addLoc(pano: google.maps.StreetViewPanoramaData, polygon: Polygon) {
     } else if (settings.heading.reference === 'backward') {
       heading = (pano.tiles.centerHeading + 180) % 360
     } else if (settings.heading.reference === 'link' && pano.links.length > 0) {
-      heading = parseInt(
-        settings.getDeadEnds && settings.deadEndsLookBackwards
-          ? pano.links[0].heading - 180
-          : pano.links[0].heading,
-      )
+      heading = pano.links[0].heading
     }
     if (settings.heading.randomInRange) {
       heading += randomInRange(settings.heading.range[0], settings.heading.range[1])
