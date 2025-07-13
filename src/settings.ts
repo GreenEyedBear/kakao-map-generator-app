@@ -15,7 +15,7 @@ const defaultSettings = {
   rejectUnofficial: true,
   rejectOfficial: false,
   findByGeneration: {
-    enabled: true,
+    enabled: false,
     generation: {
       1: false,
       23: true,
@@ -235,7 +235,7 @@ const defaultSettings = {
   checkImports: false,
 }
 
-const storedSettings = useStorage('map_generator__settings_v11', defaultSettings)
+const storedSettings = useStorage('map_generator__settings_v12', defaultSettings)
 const settings = reactive(storedSettings.value)
 settings.toDate = currentDate
 settings.toYear = currentYear
