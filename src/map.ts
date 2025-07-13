@@ -124,10 +124,10 @@ async function initMap(el: string) {
       { text: 'Copy Coordinates', callback: copyCoords },
       { text: 'See Nearest Pano', callback: openNearestPano },
     ],
-    center: [0, 0],
+    center: [36.1126901, 127.6279063],
     preferCanvas: true,
-    zoom: 1,
-    minZoom: 1,
+    zoom: 6,
+    minZoom: 6,
     zoomControl: false,
     worldCopyJump: true,
   })

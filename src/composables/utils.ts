@@ -1,5 +1,5 @@
 export function isOfficial(pano: string) {
-  return pano.length === 22 // Checks if pano ID is 22 characters long. Otherwise, it's an Ari
+  return pano.length === 10 // Checks if pano ID is 22 characters long. Otherwise, it's an Ari
   // return (!/^\xA9 (?:\d+ )?Google$/.test(pano.copyright))
 }
 
