@@ -199,7 +199,7 @@
             v-model="settings.onlyCheckBlueLines"
             title="Significatly speeds up generation in areas with sparse coverage density. May negatively affect speeds if generating locations exclusively in areas with very dense coverage. (Official coverage only)"
           >
-            Only check in areas with blue lines
+            Only check in areas with Google blue lines
           </Checkbox>
 
           <div v-if="!settings.rejectOfficial">
@@ -221,10 +221,6 @@
         </div>
         <div class="flex-1 min-h-0 overflow-y-auto">
           <Collapsible :is-open="panels.coverageSettings" class="p-1">
-            <Checkbox v-if="!settings.rejectOfficial" v-model="settings.rejectUnofficial"
-              >Reject unofficial</Checkbox
-            >
-            <Checkbox v-model="settings.rejectOfficial">Find unofficial coverage</Checkbox>
             <Checkbox v-if="settings.rejectOfficial" v-model="settings.findPhotospheres"
               >Find photospheres only</Checkbox
             >
@@ -257,7 +253,6 @@
                 </div>
               </div>
 
-              <Checkbox v-model="settings.findByGeneration.enabled">Find by generation</Checkbox>
               <div v-if="settings.findByGeneration.enabled" class="ml-6">
                 <Checkbox v-model="settings.findByGeneration.generation[1]">Gen 1</Checkbox>
                 <Checkbox v-model="settings.findByGeneration.generation[23]">Gen 2 & 3</Checkbox>
@@ -319,15 +314,6 @@
                 </div>
               </div>
             </div>
-
-            <Checkbox v-model="settings.checkAllDates">Check all dates</Checkbox>
-
-            <Checkbox
-              v-if="settings.rejectUnofficial && !settings.rejectOfficial"
-              v-model="settings.randomInTimeline"
-            >
-              Choose random date in time range
-            </Checkbox>
           </Collapsible>
         </div>
       </div>
@@ -562,23 +548,11 @@
         </div>
 
         <Collapsible :is-open="panels.marker" class="p-1">
-          <Checkbox
-            v-model="settings.markers.noBlueLine"
-            v-on:change="updateMarkerLayers('noBlueLine')"
-          >
-            <span class="h-3 w-3 bg-[#E412D2] rounded-full"></span>No blue line
-          </Checkbox>
           <Checkbox v-model="settings.markers.newRoad" v-on:change="updateMarkerLayers('newRoad')">
             <span class="h-3 w-3 bg-[#CA283F] rounded-full"></span>New Road
           </Checkbox>
-          <Checkbox v-model="settings.markers.gen4" v-on:change="updateMarkerLayers('gen4')">
-            <span class="h-3 w-3 bg-[#2880CA] rounded-full"></span>Gen 4 Update
-          </Checkbox>
           <Checkbox v-model="settings.markers.gen2Or3" v-on:change="updateMarkerLayers('gen2Or3')">
-            <span class="h-3 w-3 bg-[#9A28CA] rounded-full"></span>Gen 2 or 3 Update
-          </Checkbox>
-          <Checkbox v-model="settings.markers.gen1" v-on:change="updateMarkerLayers('gen1')">
-            <span class="h-3 w-3 bg-[#24AC20] rounded-full"></span>Gen 1 Update
+            <span class="h-3 w-3 bg-[#9A28CA] rounded-full"></span>Update
           </Checkbox>
           <Checkbox
             v-model="settings.markers.cluster"
@@ -678,15 +652,61 @@ const { currentDate } = getCurrentDate()
 
 const currentVersion = ref('')
 const SV = new google.maps.StreetViewService()
-
-watch(
-  () => settings.rejectOfficial,
-  (newVal) => {
-    if (newVal) {
-      settings.rejectUnofficial = false
-    }
-  },
-)
+SV.getPanorama = async (
+  panoramaRequest: google.maps.StreetViewLocationRequest,
+  onCompleted: (
+    res: google.maps.StreetViewPanoramaData | null,
+    status: google.maps.StreetViewStatus,
+  ) => void,
+) => {
+  let uri: string
+  if (panoramaRequest.pano) {
+    uri = `https://rv.map.kakao.com/roadview-search/v2/node/${panoramaRequest.pano}?SERVICE=glpano`
+  } else {
+    const { lat, lng } = panoramaRequest.location!
+    const rad = panoramaRequest.radius || 50
+    uri = `https://rv.map.kakao.com/roadview-search/v2/nodes?PX=${lng}&PY=${lat}&RAD=${rad}&PAGE_SIZE=1&INPUT=wgs&TYPE=w&SERVICE=glpano`
+  }
+  await fetch(uri)
+    .then((resp) => resp.json())
+    .then((json) => {
+      const result = json.street_view.street ?? json.street_view.streetList?.[0]
+      if (!result) {
+        onCompleted(null, google.maps.StreetViewStatus.ZERO_RESULTS)
+        return
+      }
+      const date = result.shot_date
+      const panoId = result.id.toString()
+      const heading = (parseFloat(result.angle) + 180) % 360
+      const res = {
+        links:
+          result.spot?.map((r) => ({
+            pano: r.id.toString(),
+            heading: (parseFloat(r.pan) % 180) + (heading > 180 ? 180 : 0),
+          })) ?? [],
+        location: {
+          pano: panoId,
+          latLng: new google.maps.LatLng(result.wgsy, result.wgsx),
+          description: result.addr,
+        },
+        imageDate: date,
+        tiles: {
+          centerHeading: heading,
+        },
+        time: [
+          ...(result.past?.map((r) => ({
+            date: new Date(r.shot_date),
+            pano: r.id.toString(),
+          })) ?? []),
+          {
+            date: new Date(date),
+            pano: panoId,
+          },
+        ].sort((r) => r.date),
+      }
+      return onCompleted(res, google.maps.StreetViewStatus.OK)
+    })
+}
 
 const panels = useStorage('map_generator__panels', {
   layer: true,
@@ -1172,24 +1192,7 @@ function addLoc(pano: google.maps.StreetViewPanoramaData, polygon: Polygon) {
   const previousPano = time[time.length - 2]?.pano
 
   // New road
-  if (!previousPano) {
-    checkHasBlueLine(pano.location.latLng.toJSON()).then((hasBlueLine) => {
-      addLocation(location, polygon, hasBlueLine ? icons.newLoc : icons.noBlueLine)
-    })
-  } else {
-    SV.getPanorama({ pano: previousPano }, (previousPano) => {
-      if (previousPano.tiles.worldSize.height === 1664) {
-        // Gen 1
-        return addLocation(location, polygon, icons.gen1)
-      } else if (previousPano.tiles.worldSize.height === 6656) {
-        // Gen 2 or 3
-        return addLocation(location, polygon, icons.gen2Or3)
-      } else {
-        // Gen 4
-        return addLocation(location, polygon, icons.gen4)
-      }
-    })
-  }
+  addLocation(location, polygon, previousPano ? icons.gen2Or3 : icons.newLoc)
 }
 
 function addLocation(
@@ -1229,7 +1232,7 @@ function addLocation(
       const marker = L.marker([location.lat, location.lng], { icon: iconType, forceZIndex: zIndex })
         .on('click', () => {
           window.open(
-            `https://www.google.com/maps/@?api=1&map_action=pano&pano=${location.panoId}${location.heading ? '&heading=' + location.heading : ''}${location.pitch ? '&pitch=' + location.pitch : ''}${location.zoom ? '&fov=' + String(180 / 2 ** location.zoom) : ''}`,
+            `https://map.kakao.com/?map_type=TYPE_MAP&map_attribute=ROADVIEW&panoid=${location.panoId}&pan=${location.heading}`,
             '_blank',
           )
         })
