@@ -708,7 +708,7 @@ SV.getPanorama = async (
     })
 }
 
-const panels = useStorage('map_generator__panels', {
+const panels = useStorage('kakao_map_generator__panels', {
   layer: true,
   generatorSettings: true,
   coverageSettings: true,

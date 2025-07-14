@@ -235,7 +235,7 @@ const defaultSettings = {
   checkImports: false,
 }
 
-const storedSettings = useStorage('map_generator__settings_v12', defaultSettings)
+const storedSettings = useStorage('kakao_map_generator__settings', defaultSettings)
 const settings = reactive(storedSettings.value)
 settings.toDate = currentDate
 settings.toYear = currentYear

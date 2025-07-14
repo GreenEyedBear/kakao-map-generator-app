@@ -281,7 +281,7 @@ type OverlayMapName = keyof typeof overlayMaps
 const storedLayers = useStorage<{
   base: BaseMapName
   overlays: OverlayMapName[]
-}>('map_generator__layers', {
+}>('kakao_map_generator__layers', {
   base: 'Roadmap',
   overlays: ['Google Street View Official Only'],
 })
